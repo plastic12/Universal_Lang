@@ -16,7 +16,7 @@ public class Comment extends Command
 			writer.write("\t");
 		}
 		//write code
-		writer.write("\\"+comment);
+		writer.write("//"+comment);
 		writer.println();
 		return 0;
 	}
