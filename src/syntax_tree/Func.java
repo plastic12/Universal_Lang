@@ -24,28 +24,39 @@ public class Func implements CodeWritable
 	{
 		commands.add(command);
 	}
+	public AModifier getModifier()
+	{
+		return modifier;
+	}
+	public String signature(Lang lang)
+	{
+		
+		String output="";
+		switch(lang)
+		{
+		case CPP:
+			output+=type+" "+name+" "+"(";
+			break;
+		case JAVA:
+			output+=modifier+" "+type+" "+name+" "+"(";
+			break;
+		}
+		for(Iterator<Field> iter=parameters.iterator();iter.hasNext();)
+		{
+			Field field=iter.next();
+			output+=field.getType()+" "+field.getName();
+			if(iter.hasNext())
+				output+=",";
+		}
+		output+=")";
+		return output;
+	}
 	@Override
 	public int write(PrintWriter writer, Lang lang, int scope) {
 		switch(lang)
 		{
 		case CPP:
-			break;
-		case JAVA:
 			//start function
-			for(int i=0;i<scope;i++)
-			{
-				writer.write("\t");
-			}
-			writer.write(modifier+" "+type+" "+name+" "+"(");
-			
-			for(Iterator<Field> iter=parameters.iterator();iter.hasNext();)
-			{
-				Field field=iter.next();
-				writer.write(field.getType()+" "+field.getName());
-				if(iter.hasNext())
-					writer.write(",");
-			}
-			writer.write(")");
 			writer.write("{");
 			writer.println();
 			scope++;
@@ -60,7 +71,26 @@ public class Func implements CodeWritable
 			{
 				writer.write("\t");
 			}
-			writer.write("}");
+			writer.println("}");
+			writer.println();
+			break;
+		case JAVA:
+			//start function
+			writer.write("{");
+			writer.println();
+			scope++;
+			//start the scope
+			for(Command command:commands)
+			{
+				scope+=command.write(writer, lang, scope);
+			}
+			//end function
+			scope--;
+			for(int i=0;i<scope;i++)
+			{
+				writer.write("\t");
+			}
+			writer.println("}");
 			writer.println();
 			break;
 		}

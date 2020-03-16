@@ -32,7 +32,7 @@ public class ClassForm
 	}
 	public void write(Lang lang) throws IOException
 	{
-		String filename;
+		//write file
 		switch(lang)
 		{
 		case CPP:
@@ -44,10 +44,111 @@ public class ClassForm
 			break;
 		}
 		int scope=0;
+		//write code
 		switch(lang)
 		{
 		case CPP:
-			//TODO
+			//write header file
+			//write preprocessor
+			os2.println("#ifndef "+name.toUpperCase()+"_H");
+			os2.println("#define "+name.toUpperCase()+"_H");
+			//TODO add dependency
+			//write code
+			os2.println("class "+name+"{");
+			scope=1;
+			//variable
+			//sort all public private protected
+			ArrayList<Field> publicField=new ArrayList<Field>();
+			ArrayList<Field> protectedField=new ArrayList<Field>();
+			ArrayList<Field> privateField=new ArrayList<Field>();
+			ArrayList<Func> publicFunc=new ArrayList<Func>();
+			ArrayList<Func> protectedFunc=new ArrayList<Func>();
+			ArrayList<Func> privateFunc=new ArrayList<Func>();
+			for(Field field:fields)
+			{
+				switch(field.getModifier())
+				{
+				case PUBLIC:
+					publicField.add(field);
+					break;
+				case PROTECTED:
+					protectedField.add(field);
+					break;
+				case PRIVATE:
+					privateField.add(field);
+					break;
+				}	
+			}
+			for(Func function:functions)
+			{
+				switch(function.getModifier())
+				{
+				case PUBLIC:
+					publicFunc.add(function);
+					break;
+				case PROTECTED:
+					protectedFunc.add(function);
+					break;
+				case PRIVATE:
+					privateFunc.add(function);
+					break;
+				}	
+			}
+			//write public protected private
+			os2.println("\tprivate:");
+			for(Field field:privateField)
+			{
+				field.write(os2, Lang.CPP, scope);
+			}
+			for(Func function:privateFunc)
+			{
+				os2.write("\t");
+				os2.write(function.signature(lang));
+				os2.write(';');
+				os2.println();
+			}
+			os2.println("\tprotected:");
+			for(Field field:protectedField)
+			{
+				field.write(os2, Lang.CPP, scope);
+			}
+			for(Func function:protectedFunc)
+			{
+				os2.write("\t");
+				os2.write(function.signature(lang));
+				os2.write(';');
+				os2.println();
+			}
+			os2.println("\tpublic:");
+			for(Field field:publicField)
+			{
+				field.write(os2, Lang.CPP, scope);
+			}
+			for(Func function:publicFunc)
+			{
+				os2.write("\t");
+				os2.write(function.signature(lang));
+				os2.write(';');
+				os2.println();
+			}
+			os2.write("};\n");
+			//write end proprocessor
+			os2.println("#endif");
+			os2.flush();
+			//write cpp
+			scope=0;
+			os.println("#include \""+name+".hpp"+"\"");
+			
+			for(Func function:functions)
+			{
+				os.println();
+				os.write(name+"::");
+				os.write(function.signature(lang));
+				function.write(os, lang, scope);
+			}
+			
+			
+			
 			break;
 		case JAVA:
 			//write class
@@ -62,7 +163,8 @@ public class ClassForm
 			//write function+write function header
 			for(Func function:functions)
 			{
-				scope+=function.write(os, lang, scope);
+				os.write("\t"+function.signature(lang));
+				function.write(os, lang, scope);
 			}
 			//end class
 			os.println("}");

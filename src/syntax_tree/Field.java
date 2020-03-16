@@ -19,6 +19,8 @@ public class Field implements CodeWritable
 		switch(lang)
 		{
 		case CPP:
+			writer.write(type+" "+name+";");
+			writer.println();
 			break;
 		case JAVA:
 			writer.println(modifier+" "+type+" "+name+";");
@@ -26,6 +28,7 @@ public class Field implements CodeWritable
 		}
 		return 0;
 	}
+	public AModifier getModifier() {return modifier;}
 	public String getType() {return type;}
 	public String getName() {return name;}
 	
