@@ -4,21 +4,30 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.TreeSet;
 
-public class Func implements CodeWritable
+public class Func implements CodeWritable,Depends
 {
 	private AModifier modifier;
 	private String name;
 	private String type;
+	private boolean isPrimitive;
 	private ArrayList<Field> parameters;
 	private LinkedList<Command> commands;
-	public Func(AModifier modifier,String type,String name)
+	public Func(AModifier modifier,String type,String name,boolean isPrimitive)
 	{
-		this.modifier=modifier;this.type=type;this.name=name;commands=new LinkedList<Command>();parameters=new ArrayList<Field>();
+		this.modifier=modifier;this.type=type;this.name=name;
+		this.isPrimitive=isPrimitive;
+		commands=new LinkedList<Command>();parameters=new ArrayList<Field>();
 	}
-	public Func(AModifier modifier,String type,String name,ArrayList<Field> parameters)
+	public Func(AModifier modifier,String type,String name,boolean isPrimitive,ArrayList<Field> parameters)
 	{
-		this.modifier=modifier;this.type=type;this.name=name;commands=new LinkedList<Command>();this.parameters=parameters;
+		this.modifier=modifier;
+		this.type=type;
+		this.name=name;
+		this.isPrimitive=isPrimitive;
+		commands=new LinkedList<Command>();
+		this.parameters=parameters;
 	}
 	public void addCommand(Command command)
 	{
@@ -35,10 +44,10 @@ public class Func implements CodeWritable
 		switch(lang)
 		{
 		case CPP:
-			output+=type+" "+name+" "+"(";
+			output+=type+" "+name+"(";
 			break;
 		case JAVA:
-			output+=modifier+" "+type+" "+name+" "+"(";
+			output+=modifier+" "+type+" "+name+"(";
 			break;
 		}
 		for(Iterator<Field> iter=parameters.iterator();iter.hasNext();)
@@ -51,6 +60,7 @@ public class Func implements CodeWritable
 		output+=")";
 		return output;
 	}
+	public LinkedList<Command> getCommands(){return commands;}
 	@Override
 	public int write(PrintWriter writer, Lang lang, int scope) {
 		switch(lang)
@@ -95,6 +105,19 @@ public class Func implements CodeWritable
 			break;
 		}
 		return 0;
+	}
+	@Override
+	public String depends(Lang lang) 
+	{
+		if(!isPrimitive)
+		{
+			switch(lang)
+			{
+			case CPP:
+				return "\""+type+".hpp"+"\"";
+			}
+		}
+		return null;
 	}
 
 }

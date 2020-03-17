@@ -13,12 +13,14 @@ import java.util.HashMap;
 public class ShortCut extends Command
 {
 	public static HashMap<ShortCutPair,String> library;
+	public static HashMap<ShortCutPair,String> depends;
+	public static String dependfile="depend.dat";
 	public static String libraryfile="library.dat";
 	private String name;
 	private String[] args;
 	static
 	{
-		library=readLib();
+		readLib();
 	}
 	public ShortCut(String name,String[] args)
 	{
@@ -41,7 +43,7 @@ public class ShortCut extends Command
 		return 0;
 	}
 	@SuppressWarnings("unchecked")
-	public static HashMap<ShortCutPair,String> readLib()
+	public static void readLib()
 	{
 		File file=new File(libraryfile);
 		if(file.exists())
@@ -49,14 +51,34 @@ public class ShortCut extends Command
 			//read file
 			try (ObjectInputStream os=new ObjectInputStream(new FileInputStream(file));)
 			{
-				return (HashMap<ShortCutPair,String>) os.readObject();
+				library= (HashMap<ShortCutPair,String>) os.readObject();
 			} catch (Exception e) {
-				System.out.println("problem occur in reading the library");
-				return new HashMap<ShortCutPair,String>();
+				System.out.println("problem occur in reading the code library");
+				library= new HashMap<ShortCutPair,String>();
 			}
 		}
 		else
-			return new HashMap<ShortCutPair,String>();
+			library= new HashMap<ShortCutPair,String>();
+		file=new File(dependfile);
+		if(file.exists())
+		{
+			//read file
+			try (ObjectInputStream os=new ObjectInputStream(new FileInputStream(file));)
+			{
+				depends= (HashMap<ShortCutPair,String>) os.readObject();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+		}
+		else
+			depends= new HashMap<ShortCutPair,String>();
 	}
 	public static void saveLib()
 	{
@@ -72,12 +94,33 @@ public class ShortCut extends Command
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		file=new File(dependfile);
+		try {
+			ObjectOutputStream oo=new ObjectOutputStream(new FileOutputStream(file));
+			oo.writeObject(depends);
+			oo.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 			
 
 	}
 	public static void addKeyword(String name,Lang lang,String code)
 	{
 		library.put(new ShortCutPair(name,lang), code);
+	}
+	public static void addDepend(String name,Lang lang,String code)
+	{
+		depends.put(new ShortCutPair(name,lang), code);
+	}
+	@Override
+	public String depends(Lang lang) {
+		
+		return depends.get(new ShortCutPair(name,lang));
 	}
 
 }

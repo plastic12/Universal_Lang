@@ -15,4 +15,10 @@ public class EndCondition extends Command
 		return -1;
 	}
 
+	@Override
+	public String depends(Lang lang) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

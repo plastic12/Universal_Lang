@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.TreeSet;
 
 public class ClassForm 
 {
@@ -22,9 +23,9 @@ public class ClassForm
 		fields=new ArrayList<Field>();
 		functions=new ArrayList<Func>();
 	}
-	public void addField(AModifier modifier,String type,String name)
+	public void addField(AModifier modifier,String type,String name,boolean isPrimitive)
 	{
-		fields.add(new Field(modifier,type,name));
+		fields.add(new Field(modifier,type,name,isPrimitive));
 	}
 	public void addFunc(Func function)
 	{
@@ -52,7 +53,10 @@ public class ClassForm
 			//write preprocessor
 			os2.println("#ifndef "+name.toUpperCase()+"_H");
 			os2.println("#define "+name.toUpperCase()+"_H");
-			//TODO add dependency
+			//add dependency
+			TreeSet<String> dependencies=addDependencies(Lang.CPP);
+			for(String c:dependencies)
+				os2.println("#include "+c);
 			//write code
 			os2.println("class "+name+"{");
 			scope=1;
@@ -174,6 +178,30 @@ public class ClassForm
 		os.flush();
 		if(os2!=null)
 		os2.flush();
-		
+	}
+	public TreeSet<String> addDependencies(Lang lang)
+	{
+		TreeSet<String> output=new TreeSet<String>();
+		//write field
+		for(Field f:fields)
+		{
+			String s=f.depends(lang);
+			if(s!=null)
+				output.add(s);
+		}
+		//write function
+		for(Func f:functions)
+		{
+			String s=f.depends(lang);
+			if(s!=null)
+				output.add(s);
+			for(Command c:f.getCommands())
+			{
+				String s2=c.depends(lang);
+				if(s2!=null)
+					output.add(s2);
+			}
+		}
+		return output;
 	}
 }

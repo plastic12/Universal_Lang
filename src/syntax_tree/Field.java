@@ -2,13 +2,14 @@ package syntax_tree;
 
 import java.io.PrintWriter;
 
-public class Field implements CodeWritable
+public class Field implements CodeWritable,Depends
 {
 	private AModifier modifier;
 	private String type;
 	private String name;
-	public Field(AModifier modifier,String type,String name)
-	{this.modifier=modifier;this.type=type;this.name=name;}
+	private boolean isPrimitive;
+	public Field(AModifier modifier,String type,String name,boolean isPrimitive)
+	{this.modifier=modifier;this.type=type;this.name=name;this.isPrimitive=isPrimitive;}
 	@Override
 	public int write(PrintWriter writer, Lang lang, int scope) 
 	{
@@ -31,6 +32,20 @@ public class Field implements CodeWritable
 	public AModifier getModifier() {return modifier;}
 	public String getType() {return type;}
 	public String getName() {return name;}
+	public boolean isPrimitive() {return isPrimitive;}
+	@Override
+	public String depends(Lang lang) 
+	{
+		if(!isPrimitive)
+		{
+			switch(lang)
+			{
+			case CPP:
+				return "\""+type+".hpp"+"\"";
+			}
+		}
+		return null;
+	}
 	
 	
 	

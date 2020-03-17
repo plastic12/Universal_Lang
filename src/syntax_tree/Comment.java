@@ -20,5 +20,10 @@ public class Comment extends Command
 		writer.println();
 		return 0;
 	}
+	@Override
+	public String depends(Lang lang) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

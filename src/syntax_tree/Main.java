@@ -14,7 +14,9 @@ public class Main
 {
 	public static void main(String[] args) throws IOException
 	{
-		testMain();
+		//addDepend();
+		testClass();
+		//addShortCut();
 	}
 	public static void testMain() throws IOException
 	{
@@ -25,24 +27,40 @@ public class Main
 	}
 	public static void testClass() throws IOException
 	{
-		ClassForm testClass=new ClassForm("TestClass");
-		testClass.addField(AModifier.PRIVATE, "int", "field1");
-		testClass.addField(AModifier.PRIVATE, "double", "field2");
-		testClass.addField(AModifier.PRIVATE, "String", "field3");
-		Func func1=new Func(AModifier.PUBLIC,"void","toSth");
+		ClassForm player=new ClassForm("Player");
+		player.addField(AModifier.PRIVATE, "int", "money",true);
+		player.addField(AModifier.PRIVATE, "double", "field2",true);
+		player.addField(AModifier.PRIVATE, "Property", "property1",false);
+		player.addField(AModifier.PRIVATE, "Property", "property2",false);
+		Func func1=new Func(AModifier.PUBLIC,"void","toSth",true);
 		func1.addCommand(new Comment("to something"));
 		String[] args1= {"\"plastic12 is a god\""};
 		func1.addCommand(new ShortCut("print",args1));
 		func1.addCommand(new CBlock("int x=10;"));
 		func1.addCommand(new ConditionBlock("true"));
 		func1.addCommand(new EndCondition());
-		testClass.addFunc(func1);
-		testClass.write(Lang.CPP);
+		player.addFunc(func1);
+		player.write(Lang.CPP);
+		ClassForm property =new ClassForm("Property");
+		property.addField(AModifier.PRIVATE, "int", "price",true);
+		property.addField(AModifier.PRIVATE, "int", "rent",true);
+		property.addField(AModifier.PRIVATE, "int", "pos",true);
+		Func func2=new Func(AModifier.PUBLIC,"void","pay",true);
+		func1.addCommand(new Comment("to something"));
+		String[] args2= {"\"pay rent\""};
+		func1.addCommand(new ShortCut("print",args2));
+		property.addFunc(func2);
+		property.write(Lang.CPP);
+		//test player has 2 include
 	}
 	public static void addShortCut()
 	{
-		ShortCut.addKeyword("print", Lang.CPP, "cout<<%s<<endl");
+		ShortCut.addKeyword("print", Lang.CPP, "std::cout<<%s<<std::endl;");
 		ShortCut.saveLib();
 	}
-
+	public static void addDepend()
+	{
+		ShortCut.addDepend("print", Lang.CPP, "<iostream>");
+		ShortCut.saveLib();
+	}
 }
