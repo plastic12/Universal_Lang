@@ -4,21 +4,28 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 import java.util.TreeSet;
 
-public class Func implements CodeWritable,Depends
+public class Func implements Depends
 {
 	private AModifier modifier;
 	private String name;
 	private String type;
 	private boolean isPrimitive;
 	private ArrayList<Field> parameters;
-	private LinkedList<Command> commands;
+	private Branch b;
+	private Stack<Branch> s;
 	public Func(AModifier modifier,String type,String name,boolean isPrimitive)
 	{
 		this.modifier=modifier;this.type=type;this.name=name;
 		this.isPrimitive=isPrimitive;
-		commands=new LinkedList<Command>();parameters=new ArrayList<Field>();
+		parameters=new ArrayList<Field>();
+		b=new Branch();
+		s=new Stack<Branch>();
+		s.add(b);
 	}
 	public Func(AModifier modifier,String type,String name,boolean isPrimitive,ArrayList<Field> parameters)
 	{
@@ -26,13 +33,27 @@ public class Func implements CodeWritable,Depends
 		this.type=type;
 		this.name=name;
 		this.isPrimitive=isPrimitive;
-		commands=new LinkedList<Command>();
 		this.parameters=parameters;
+		b=new Branch();
+		s=new Stack<Branch>();
+		s.add(b);
+	}
+	public void addCondition(String condition)
+	{
+		ConditionBlock cb=new ConditionBlock(condition);
+		b.addCommand(cb);
+		s.push(cb.getBranch());
+	}
+	public void pop()
+	{
+		if(s.size()>1)
+			s.pop();
 	}
 	public void addCommand(Command command)
 	{
-		commands.add(command);
+		s.peek().addCommand(command);
 	}
+	public String getName() {return name;}
 	public AModifier getModifier()
 	{
 		return modifier;
@@ -49,61 +70,71 @@ public class Func implements CodeWritable,Depends
 		case JAVA:
 			output+=modifier+" "+type+" "+name+"(";
 			break;
+		case GO:
+			output+=name+"(";
 		}
 		for(Iterator<Field> iter=parameters.iterator();iter.hasNext();)
 		{
 			Field field=iter.next();
-			output+=field.getType()+" "+field.getName();
+			if(lang!=Lang.GO)
+			{
+				output+=field.getType()+" "+field.getName();
+			}
+			else
+			{
+				output+=field.getName()+" "+field.getType();
+			}
 			if(iter.hasNext())
 				output+=",";
 		}
 		output+=")";
+		if(lang==Lang.GO)
+			output+=" "+type;
 		return output;
 	}
-	public LinkedList<Command> getCommands(){return commands;}
-	@Override
-	public int write(PrintWriter writer, Lang lang, int scope) {
+	public int write(PrintWriter writer, Lang lang,String classname, Set<String> var,int scope) {
 		switch(lang)
 		{
 		case CPP:
 			//start function
-			writer.write("{");
-			writer.println();
-			scope++;
-			//start the scope
-			for(Command command:commands)
-			{
-				scope+=command.write(writer, lang, scope);
-			}
-			//end function
-			scope--;
 			for(int i=0;i<scope;i++)
 			{
 				writer.write("\t");
 			}
-			writer.println("}");
-			writer.println();
+			writer.write(type+" "+classname+"::"+signature(lang)+"{\n");
+			scope++;
 			break;
+			//start the scope
 		case JAVA:
 			//start function
-			writer.write("{");
-			writer.println();
-			scope++;
-			//start the scope
-			for(Command command:commands)
-			{
-				scope+=command.write(writer, lang, scope);
-			}
-			//end function
-			scope--;
 			for(int i=0;i<scope;i++)
 			{
 				writer.write("\t");
 			}
-			writer.println("}");
-			writer.println();
+			writer.write(signature(lang)+"{\n");
+			scope++;
+			//start the scope
+			break;
+		case GO:
+			//start function
+			for(int i=0;i<scope;i++)
+			{
+				writer.write("\t");
+			}
+			writer.write("func"+"(this *"+classname+") "+signature(lang)+"{\n");
+			scope++;
+			//start the scope
 			break;
 		}
+		b.write(writer, lang,classname,var, scope);
+		//end function
+		scope--;
+		for(int i=0;i<scope;i++)
+		{
+			writer.write("\t");
+		}
+		writer.println("}");
+		writer.println();
 		return 0;
 	}
 	@Override

@@ -1,5 +1,4 @@
 #include "Property.hpp"
-
-Property::void pay(){
+void Property::void pay(){
 }
 

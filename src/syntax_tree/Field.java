@@ -2,7 +2,7 @@ package syntax_tree;
 
 import java.io.PrintWriter;
 
-public class Field implements CodeWritable,Depends
+public class Field implements Depends
 {
 	private AModifier modifier;
 	private String type;
@@ -10,7 +10,6 @@ public class Field implements CodeWritable,Depends
 	private boolean isPrimitive;
 	public Field(AModifier modifier,String type,String name,boolean isPrimitive)
 	{this.modifier=modifier;this.type=type;this.name=name;this.isPrimitive=isPrimitive;}
-	@Override
 	public int write(PrintWriter writer, Lang lang, int scope) 
 	{
 		//write scope
@@ -20,11 +19,13 @@ public class Field implements CodeWritable,Depends
 		switch(lang)
 		{
 		case CPP:
-			writer.write(type+" "+name+";");
-			writer.println();
+			writer.println(type+" "+name+";");
 			break;
 		case JAVA:
 			writer.println(modifier+" "+type+" "+name+";");
+			break;
+		case GO:
+			writer.println(name+" "+type);
 			break;
 		}
 		return 0;

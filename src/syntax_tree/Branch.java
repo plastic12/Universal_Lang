@@ -1,22 +1,27 @@
 package syntax_tree;
 
 import java.io.PrintWriter;
+import java.util.LinkedList;
 import java.util.Set;
 
-public class Comment extends Command
-{
-	public String comment;
-	public Comment(String comment){this.comment=comment;}
+public class Branch extends Command{
+	LinkedList<Command> b;
+	public Branch()
+	{
+		b=new LinkedList<Command>();
+	}
 	@Override
 	public String depends(Lang lang) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@Override
 	public int write(PrintWriter writer, Lang lang, String classname, Set<String> var, int scope) {
-		//write code
-		writer.println("//"+comment);
+		for(Command c:b)
+			c.write(writer, lang, classname, var, scope);
 		return 0;
 	}
+	public void addCommand(Command c) {b.add(c);}
 
 }

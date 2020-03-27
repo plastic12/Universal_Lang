@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Set;
 
 public class ShortCut extends Command
 {
@@ -25,22 +26,6 @@ public class ShortCut extends Command
 	public ShortCut(String name,String[] args)
 	{
 		this.name=name;this.args=args;
-	}
-	@Override
-	public int write(PrintWriter writer, Lang lang, int scope) {
-		// write scope
-		for(int i=0;i<scope;i++)
-		{
-			writer.write("\t");
-		}
-		// write code
-		String format=library.get(new ShortCutPair(name,lang));
-		if(format!=null)
-			writer.write(String.format(format, (Object[])args));
-		else
-			System.out.println("library call error");
-		writer.println();
-		return 0;
 	}
 	@SuppressWarnings("unchecked")
 	public static void readLib()
@@ -121,6 +106,22 @@ public class ShortCut extends Command
 	public String depends(Lang lang) {
 		
 		return depends.get(new ShortCutPair(name,lang));
+	}
+	@Override
+	public int write(PrintWriter writer, Lang lang, String classname, Set<String> var, int scope) {
+		// write scope
+		for(int i=0;i<scope;i++)
+		{
+			writer.write("\t");
+		}
+		// write code
+		String format=library.get(new ShortCutPair(name,lang));
+		if(format!=null)
+			writer.write(String.format(format, (Object[])args));
+		else
+			System.out.println("library call error");
+		writer.println();
+		return 0;
 	}
 
 }

@@ -1,7 +1,5 @@
 #ifndef PLAYER_H
 #define PLAYER_H
-#include "Property.hpp"
-#include <iostream>
 class Player{
 	private:
 	int money;

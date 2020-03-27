@@ -33,7 +33,7 @@ public class ClassForm
 	}
 	public void write(Lang lang) throws IOException
 	{
-		//write file
+		//declare file
 		switch(lang)
 		{
 		case CPP:
@@ -43,25 +43,45 @@ public class ClassForm
 		case JAVA:
 			os=new PrintWriter(new FileWriter(new File(name+".java")));
 			break;
+		case GO:
+			os=new PrintWriter(new FileWriter(new File(name+".go")));
 		}
 		int scope=0;
+		int scope2=0;
 		//write code
+		//add preprocessor
 		switch(lang)
 		{
 		case CPP:
-			//write header file
-			//write preprocessor
 			os2.println("#ifndef "+name.toUpperCase()+"_H");
 			os2.println("#define "+name.toUpperCase()+"_H");
-			//add dependency
-			TreeSet<String> dependencies=addDependencies(Lang.CPP);
+			os.println("#include \""+name+".hpp"+"\"");
+			break;
+		case GO:
+			os.println("package main");
+			break;
+		}
+		//add dependency
+		/*
+		TreeSet<String> dependencies=addDependencies(lang);
+		switch(lang)
+		{
+		case CPP:
 			for(String c:dependencies)
 				os2.println("#include "+c);
-			//write code
+			break;
+		case GO:
+			for(String c:dependencies)
+				os.println("import "+c);
+			break;
+		}
+		*/
+		//write field
+		switch(lang)
+		{
+		case CPP:
 			os2.println("class "+name+"{");
-			scope=1;
-			//variable
-			//sort all public private protected
+			scope2=1;
 			ArrayList<Field> publicField=new ArrayList<Field>();
 			ArrayList<Field> protectedField=new ArrayList<Field>();
 			ArrayList<Field> privateField=new ArrayList<Field>();
@@ -102,7 +122,7 @@ public class ClassForm
 			os2.println("\tprivate:");
 			for(Field field:privateField)
 			{
-				field.write(os2, Lang.CPP, scope);
+				field.write(os2, Lang.CPP, scope2);
 			}
 			for(Func function:privateFunc)
 			{
@@ -114,7 +134,7 @@ public class ClassForm
 			os2.println("\tprotected:");
 			for(Field field:protectedField)
 			{
-				field.write(os2, Lang.CPP, scope);
+				field.write(os2, Lang.CPP, scope2);
 			}
 			for(Func function:protectedFunc)
 			{
@@ -126,7 +146,7 @@ public class ClassForm
 			os2.println("\tpublic:");
 			for(Field field:publicField)
 			{
-				field.write(os2, Lang.CPP, scope);
+				field.write(os2, Lang.CPP, scope2);
 			}
 			for(Func function:publicFunc)
 			{
@@ -136,49 +156,53 @@ public class ClassForm
 				os2.println();
 			}
 			os2.write("};\n");
-			//write end proprocessor
 			os2.println("#endif");
 			os2.flush();
-			//write cpp
-			scope=0;
-			os.println("#include \""+name+".hpp"+"\"");
-			
-			for(Func function:functions)
-			{
-				os.println();
-				os.write(name+"::");
-				os.write(function.signature(lang));
-				function.write(os, lang, scope);
-			}
-			
-			
-			
 			break;
 		case JAVA:
-			//write class
 			os.println("public class "+name);
 			os.println("{");
 			scope++;
-			//write variable
+			for(Field field:fields)
+			{
+				field.write(os, lang, scope);
+			}
+			break;
+		case GO:
+			os.println("type "+name+" struct {");
+			scope++;
 			for(Field field:fields)
 			{
 				scope+=field.write(os, lang, scope);
 			}
-			//write function+write function header
-			for(Func function:functions)
-			{
-				os.write("\t"+function.signature(lang));
-				function.write(os, lang, scope);
-			}
-			//end class
 			os.println("}");
-			
-			break;
+			scope=0;
+		}
+		//write func
+		TreeSet<String> var=new TreeSet<String>();
+		for(Field field:fields){
+			var.add(field.getName());
+		}
+		for(Func function:functions)
+		{
+			var.add(function.getName());
+		}
+		for(Func function:functions)
+		{
+			function.write(os,lang, name,var, scope);
+		}
+		for (;scope>0;)
+		{
+			scope--;
+			for(int i=0;i<scope;i++)
+			{
+				os.write("\t");
+			}
+			os.println("}");
 		}
 		os.flush();
-		if(os2!=null)
-		os2.flush();
 	}
+	/*
 	public TreeSet<String> addDependencies(Lang lang)
 	{
 		TreeSet<String> output=new TreeSet<String>();
@@ -204,4 +228,5 @@ public class ClassForm
 		}
 		return output;
 	}
+	*/
 }

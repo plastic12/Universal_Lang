@@ -36,11 +36,11 @@ public class Main
 		func1.addCommand(new Comment("to something"));
 		String[] args1= {"\"plastic12 is a god\""};
 		func1.addCommand(new ShortCut("print",args1));
-		func1.addCommand(new CBlock("int x=10;"));
-		func1.addCommand(new ConditionBlock("true"));
-		func1.addCommand(new EndCondition());
+		func1.addCondition("a==1");
+		func1.addCommand(new ShortCut("print",args1));
 		player.addFunc(func1);
-		player.write(Lang.CPP);
+		player.write(Lang.JAVA);
+		/*
 		ClassForm property =new ClassForm("Property");
 		property.addField(AModifier.PRIVATE, "int", "price",true);
 		property.addField(AModifier.PRIVATE, "int", "rent",true);
@@ -51,6 +51,7 @@ public class Main
 		func1.addCommand(new ShortCut("print",args2));
 		property.addFunc(func2);
 		property.write(Lang.CPP);
+		*/
 		//test player has 2 include
 	}
 	public static void addShortCut()

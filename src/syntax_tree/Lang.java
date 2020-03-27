@@ -2,5 +2,5 @@ package syntax_tree;
 
 public enum Lang 
 {
-	CPP,JAVA,PYTHON
+	CPP,JAVA,PYTHON,GO
 }
