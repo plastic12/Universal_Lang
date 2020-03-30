@@ -2,10 +2,10 @@
 #define PLAYER_H
 class Player{
 	private:
-	int money;
-	double field2;
-	Property property1;
-	Property property2;
+	null null;
+	null null;
+	null null;
+	null null;
 	protected:
 	public:
 	void toSth();

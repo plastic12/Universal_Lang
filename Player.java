@@ -5,11 +5,12 @@ public class Player
 	private Property property1;
 	private Property property2;
 	public void toSth(){
-//to something
-		System.out.println("plastic12 is a god");
-		if(a==1){
-			System.out.println("plastic12 is a god");
-		}
+		int x=1;
+		int y=3;
+		int temp;
+		temp=x;
+		x=y;
+		y=temp;
 	}
 
 }

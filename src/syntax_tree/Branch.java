@@ -17,9 +17,9 @@ public class Branch extends Command{
 	}
 
 	@Override
-	public int write(PrintWriter writer, Lang lang, String classname, Set<String> var, int scope) {
+	public int write(PrintWriter writer, Lang lang, String classname, int scope) {
 		for(Command c:b)
-			c.write(writer, lang, classname, var, scope);
+			c.write(writer, lang, classname, scope);
 		return 0;
 	}
 	public void addCommand(Command c) {b.add(c);}

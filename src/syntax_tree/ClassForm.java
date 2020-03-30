@@ -27,6 +27,24 @@ public class ClassForm
 	{
 		fields.add(new Field(modifier,type,name,isPrimitive));
 	}
+	public Field searchField(String name)
+	{
+		for(Field field:fields)
+		{
+			if(field.getName()==name)
+				return field;
+		}
+		return null;
+	}
+	public Func searchFunc(String name)
+	{
+		for(Func func:functions)
+		{
+			if(func.getHashName()==name)
+				return func;
+		}
+		return null;
+	}
 	public void addFunc(Func function)
 	{
 		functions.add(function);
@@ -179,17 +197,9 @@ public class ClassForm
 			scope=0;
 		}
 		//write func
-		TreeSet<String> var=new TreeSet<String>();
-		for(Field field:fields){
-			var.add(field.getName());
-		}
 		for(Func function:functions)
 		{
-			var.add(function.getName());
-		}
-		for(Func function:functions)
-		{
-			function.write(os,lang, name,var, scope);
+			function.write(os,lang, name, scope);
 		}
 		for (;scope>0;)
 		{

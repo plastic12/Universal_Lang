@@ -2,14 +2,14 @@ package syntax_tree;
 
 import java.io.PrintWriter;
 
-public class Field implements Depends
+public class Field extends Var implements Depends
 {
 	private AModifier modifier;
-	private String type;
-	private String name;
 	private boolean isPrimitive;
-	public Field(AModifier modifier,String type,String name,boolean isPrimitive)
-	{this.modifier=modifier;this.type=type;this.name=name;this.isPrimitive=isPrimitive;}
+	public Field(AModifier modifier,String type,String name,boolean isPrimitive){
+		super(name,type);
+		this.modifier=modifier;this.isPrimitive=isPrimitive;
+	}
 	public int write(PrintWriter writer, Lang lang, int scope) 
 	{
 		//write scope
@@ -33,6 +33,17 @@ public class Field implements Depends
 	public AModifier getModifier() {return modifier;}
 	public String getType() {return type;}
 	public String getName() {return name;}
+	public String getName(Lang lang) {
+		switch(lang)
+		{
+		case GO:
+		case JAVA:
+			return "this."+name;
+		case CPP:
+			return "this->"+name;
+		}
+		return "";
+	}
 	public boolean isPrimitive() {return isPrimitive;}
 	@Override
 	public String depends(Lang lang) 

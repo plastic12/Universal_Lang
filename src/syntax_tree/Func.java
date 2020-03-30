@@ -53,7 +53,9 @@ public class Func implements Depends
 	{
 		s.peek().addCommand(command);
 	}
+	public String getHashName() {return name+"()";}
 	public String getName() {return name;}
+	public String getType() {return type;}
 	public AModifier getModifier()
 	{
 		return modifier;
@@ -78,11 +80,11 @@ public class Func implements Depends
 			Field field=iter.next();
 			if(lang!=Lang.GO)
 			{
-				output+=field.getType()+" "+field.getName();
+				output+=field.getType()+" "+field.getName(lang);
 			}
 			else
 			{
-				output+=field.getName()+" "+field.getType();
+				output+=field.getName(lang)+" "+field.getType();
 			}
 			if(iter.hasNext())
 				output+=",";
@@ -92,7 +94,7 @@ public class Func implements Depends
 			output+=" "+type;
 		return output;
 	}
-	public int write(PrintWriter writer, Lang lang,String classname, Set<String> var,int scope) {
+	public int write(PrintWriter writer, Lang lang,String classname,int scope) {
 		switch(lang)
 		{
 		case CPP:
@@ -126,7 +128,7 @@ public class Func implements Depends
 			//start the scope
 			break;
 		}
-		b.write(writer, lang,classname,var, scope);
+		b.write(writer, lang,classname, scope);
 		//end function
 		scope--;
 		for(int i=0;i<scope;i++)

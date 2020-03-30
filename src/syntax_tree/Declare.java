@@ -4,15 +4,13 @@ import java.io.PrintWriter;
 import java.util.Set;
 
 public class Declare extends Command{
-	private String type;
-	private String name;
-	private String init;
+	private Var var;
+	private Value init;
 	
 	
-	public Declare(String type,String name,String init)
+	public Declare(Var var,Value init)
 	{
-		this.type=type;
-		this.name=name;
+		this.var=var;
 		this.init=init;
 	}
 	@Override
@@ -21,7 +19,7 @@ public class Declare extends Command{
 		return null;
 	}
 	@Override
-	public int write(PrintWriter writer, Lang lang, String classname, Set<String> var, int scope) 
+	public int write(PrintWriter writer, Lang lang, String classname, int scope) 
 	{
 		for(int i=0;i<scope;i++)
 			writer.print("\t");
@@ -30,15 +28,15 @@ public class Declare extends Command{
 		case CPP:
 		case JAVA:
 			if(init!=null)
-				writer.println(type+" "+name+"="+init+";");
+				writer.println(this.var.getType()+" "+this.var.getName(lang)+"="+init.getName(lang)+";");
 			else
-				writer.println(type+" "+name+";");
+				writer.println(this.var.getType()+" "+this.var.getName(lang)+";");
 			break;
 		case GO:
 			if(init!=null)
-				writer.println(name+":="+init);
+				writer.println(this.var.getName(lang)+":="+init.getName(lang));
 			else
-				writer.println("var "+name+" "+type);
+				writer.println("var "+this.var.getName(lang)+" "+this.var.getType());
 			break;
 		}
 		return 0;
